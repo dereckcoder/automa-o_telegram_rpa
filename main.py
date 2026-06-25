@@ -1,20 +1,18 @@
 import queue
+import threading
 import telebot
-from settings import token_telegram # importa token
-from settings import id_contado_telegram # importa id contado admin
-from bot_telegram import iniciar_bot_escuta_telegram
 
+from settings import token_telegram
 
+from rpatelegram.bot_telegram import iniciar_bot_escuta_telegram
+from rpaweb.bot_rpa import iniciar_worker
 
+bot = telebot.TeleBot(token_telegram)
 
-def main():
+fila_trabalho = queue.Queue()
 
-    bot = telebot.TeleBot(token_telegram)
-    fila_trabalho = queue.Queue()
+thread_worker = threading.Thread(target=iniciar_worker,args=(bot, fila_trabalho),daemon=True)
 
-    iniciar_bot_escuta_telegram(
-        bot,
-        fila_trabalho
-    )
-if __name__ == "__main__":
-    main()
+thread_worker.start()
+
+iniciar_bot_escuta_telegram(bot,fila_trabalho)

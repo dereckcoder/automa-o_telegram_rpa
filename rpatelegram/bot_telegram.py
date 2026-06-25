@@ -1,6 +1,7 @@
 import queue # fila telegram
 import telebot # bot telegram 
 import re # formatacao de texto
+import threading
 from settings import token_telegram # importa token
 from settings import id_contado_telegram # importa id contado admin
 
