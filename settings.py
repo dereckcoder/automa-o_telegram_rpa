@@ -10,5 +10,5 @@ site_user = os.getenv("site_user")
 site_senha = os.getenv("site_senha")
 url_tela_login = os.getenv("url_tela_login")
 url_tela_formulario = os.getenv("url_tela_formulario")
-
+url_tela_launchpad = os.getenv("url_tela_launchpad")
 

@@ -24,7 +24,7 @@ def reset_senha(page: Page, login_z,url_tela_formulario: str):
     botao.wait_for(state="visible", timeout=10000)
 
     texto = botao.inner_text()
-    print(texto)
+    #@print(texto)
     
     botao = page.get_by_text(login_z)#troca troca###
     botao.wait_for(state="visible", timeout=10000)
@@ -32,16 +32,23 @@ def reset_senha(page: Page, login_z,url_tela_formulario: str):
 
     botao = page.get_by_role("button", name="Enviar")
     botao.click()
-
     try:
         page.get_by_text("Seu formulário foi enviado.").wait_for(timeout=15000)
         menssagem_sen = page.locator("p").filter(has_text="Nova senha:").inner_text()
         print(menssagem_sen)
-        return True
+        return{"colaborador": texto,
+            "status": "sucesso",
+            "login_z": login_z,
+            "mensagem": menssagem_sen,
+            "nova_senha": menssagem_sen}
+    
 
     except:
+        
         print("Falha ao validar formulário...")
-        return False
+        return {
+        "status": "erro",
+        "login_z": login_z,}
 
 
 
