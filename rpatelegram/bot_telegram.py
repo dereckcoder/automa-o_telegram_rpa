@@ -15,7 +15,6 @@ def iniciar_bot_escuta_telegram(bot: telebot.TeleBot, fila_trabalho: queue.Queue
             "`LoginZ Nome Completo`\n\n"
             "💡 *Exemplo:* `Z12345 Joaozinho da silva`")
         bot.send_message(message.chat.id, texto, parse_mode="Markdown")
-        print("bot ligado")
 
     ### raspa as messangens digitas pelo usuario ###  
     @bot.message_handler(func=lambda message: True)
@@ -31,8 +30,6 @@ def iniciar_bot_escuta_telegram(bot: telebot.TeleBot, fila_trabalho: queue.Queue
             resultado = re.match(r'^([A-Za-z]?\d{6})\s+(.+)$', texto)#formataco de texto
             login_z = resultado.group(1).upper()
             nome_login_z = resultado.group(2).upper()
-            
-            print("valorZ guardado e valor nome guardado")
             bot.send_message(chat_id,
             "✅*Dados recebidos com sucesso!*\n"
             f"👤 *Nome:* {nome_login_z}\n"
@@ -43,14 +40,12 @@ def iniciar_bot_escuta_telegram(bot: telebot.TeleBot, fila_trabalho: queue.Queue
                 "Nome": nome_login_z,
                 "LoginZ": login_z}
             fila_trabalho.put(fila_solicitacao)
-            bot.send_message(chat_id,"✅ Solicitação adicionada à fila.") 
-            
-        ### vai rodar com erro ###        
+            bot.send_message(chat_id,"✅ Solicitação adicionada à fila.")           
+### vai rodar com erro ###        
         except Exception as e: 
             print(f"ERRO: {e}")
             bot.send_message(chat_id, "❌Ocorreu um erro ao processar sua solicitação."
-                                                       "\nLIGUE PARA O ADMINISTRADOR")
-
+                                      "\nLIGUE PARA O ADMINISTRADOR")
 def main():
 
     bot = telebot.TeleBot(token_telegram)
@@ -60,7 +55,6 @@ def main():
         bot,
         fila_trabalho
     )
-
 
 if __name__ == "__main__":
     main()

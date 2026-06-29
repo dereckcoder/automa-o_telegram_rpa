@@ -4,17 +4,19 @@ import threading
 import queue
 
 from playwright.sync_api import sync_playwright
-
 from settings import id_contado_telegram
 from settings import url_tela_login
 from settings import site_user
 from settings import site_senha
 from settings import url_tela_formulario
-
 from rpaweb.login_site import fazer_login_site
 from rpaweb.reset_password import reset_senha
 from rpaweb.anti_inatividade import manter_sessao_ativa
 from rpaweb.sessao_salva import sessao_salva
+
+TEMPO_ANTI_INATIVIDADE = 12 * 60   # 12 minutos
+TEMPO_ESPERA_FILA = 5              # 5 segundos
+TEMPO_POS_RESET = 20               # 20 segundos
 
 def iniciar_worker(bot, fila_trabalho,fila_mfadu):
 
@@ -31,7 +33,7 @@ def iniciar_worker(bot, fila_trabalho,fila_mfadu):
         ultimo_anti_inatividade = time.time()
         while True:
             try:
-                solicitacao = fila_trabalho.get(timeout=5)
+                solicitacao = fila_trabalho.get(timeout=TEMPO_ESPERA_FILA)
                 try:
                     login_z = solicitacao["LoginZ"]
                     chat_id = solicitacao["chat_id"]
@@ -51,7 +53,7 @@ def iniciar_worker(bot, fila_trabalho,fila_mfadu):
                         bot.send_message(
                         chat_id,
                         f"❌ Erro no reset do {resultado['login_z']}")
-                    time.sleep(20)
+                    time.sleep(TEMPO_POS_RESET)
 
                     if garantir_sessao(page):
                         manter_sessao_ativa(page)
@@ -67,10 +69,12 @@ def iniciar_worker(bot, fila_trabalho,fila_mfadu):
                     fila_trabalho.task_done()
             except queue.Empty:
                 agora = time.time()
-                if agora - ultimo_anti_inatividade >= 20:
+                if agora - ultimo_anti_inatividade >= TEMPO_ANTI_INATIVIDADE:
                     if garantir_sessao(page):
                         manter_sessao_ativa(page)
                         ultimo_anti_inatividade = time.time()
                     else:
                         bot.send_message(id_contado_telegram,"❌ Não foi possível recuperar a sessão no anti-inatividade.")
+
+
 
